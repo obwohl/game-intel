@@ -1,107 +1,99 @@
-# Ardem - Signal-Agenten Testbed Design (Jules Workflow)
+# Ardem - Signal-Agent Testbed Design
 
-## 1. Einleitung & Kontext: "Ardem" und seine Konkurrenten
-Das vorliegende Testbed-Design überträgt die Konzepte der rekursiven Signal-Agenten-Architektur auf ein konkretes, iteratives und kostenloses Setup mittels Google Jules und lokalen, wiederkehrenden Aufgaben (z.B. Cron-Jobs oder dedizierten Task-Schedulern anstelle von GitHub Actions). Als Testobjekt dient das Videospiel **"Ardem"**, ein immersives Open-World Survival MMO, in dem Spieler in einer von einem Virus verwüsteten Welt überleben, craften und die Zivilisation wieder aufbauen müssen.
+## 1. Introduction & Context: "Ardem" and its Competitors
 
-Um relevante Marktsignale zu generieren, müssen die Agenten die direkte Konkurrenz analysieren. Typische Konkurrenten für "Ardem" sind:
-- **DayZ:** Der Pionier des Hardcore-Survival-Genres.
-- **Rust:** Starker Fokus auf Base-Building, PvP und regelmäßige Wipes/Updates.
-- **SCUM:** Hohe Komplexität durch tiefgehende Charaktermetabolismen und Crafting.
-- **Project Zomboid:** Isometrischer Ansatz, aber sehr tiefe Survival-Mechaniken und mod-getriebene Community.
-- **7 Days to Die:** Starker Fokus auf Voxel-Building und Horden-Survival.
+This testbed design implements a recursive, self-improving signal-agent architecture. It utilizes local, recurring tasks (e.g., cron jobs or dedicated task schedulers) to maintain an iterative, zero-cost data exploration environment. The primary subject is **"Ardem"**, an immersive open-world survival MMO where players survive in a virus-ravaged world, craft items, and rebuild civilization.
 
-Ziel des Testbeds ist es, über wiederkehrende cron-basierte Aufgaben (Sessions) neue, signifikante Korrelationen zwischen den Metriken dieser Konkurrenten und dem potenziellen Markterfolg von "Ardem" zu entdecken, ohne auf teure Cloud-Infrastruktur angewiesen zu sein.
+To generate actionable market signals, the agents must analyze direct competitors. Typical competitors for "Ardem" include:
 
-## 2. Agenten-Rollen, Freiheiten und Workflow
+- **DayZ:** The pioneer of the hardcore survival genre.
+- **Rust:** Heavy focus on base-building, PvP, and regular wipe/update cycles.
+- **SCUM:** High complexity with deep character metabolism and crafting systems.
+- **Project Zomboid:** Isometric approach, but features very deep survival mechanics and a mod-driven community.
+- **7 Days to Die:** Strong focus on voxel-building and horde-survival mechanics.
 
-Das System wird durch verschiedene Prompts (Rollen) gesteuert, die als zeitlich versetzte, wiederkehrende Aufgaben (Cron-Jobs) aufgerufen werden. Die Ergebnisse jeder Session werden als Markdown-Berichte in einem dedizierten `reports/`-Verzeichnis gespeichert. Jeder Bericht enthält strikte Metadaten (Timestamp, ausführende Rolle, gefundene Einsichten, Signifikanz-Check).
+The objective of this testbed is to discover new, statistically significant correlations between competitor metrics and the potential market success of "Ardem" using a highly structured, self-improving agent pipeline.
 
-### Die Rollen (Prompts)
+## 2. Agent Roles, Autonomy, and Workflow
 
-1. **Der "Supervisor" (Meta-Agent / Orchestrator)**
-   - **Aufgabe:** Koordiniert den Tagesablauf. Liest alte Reports und entscheidet, welche Hypothesen heute getestet werden sollen. Sucht nach "Black Swan"-Events via Google News, die die Daten verzerren könnten.
-   - **Freiheiten:** Nur Lesezugriff auf Berichte und Google-Suche (Texte lesen). Darf *keinen* Code schreiben oder Daten scrapen.
-   - **Ausführung:** Täglich morgens (z.B. 06:00 Uhr).
+The system is governed by specialized prompts (roles) executed sequentially via scheduled cron jobs. All work is conducted and logged strictly in English. Results, methodologies, and execution logs must be saved into a `logs/` and `reports/` directory structure sorted by the current system date.
 
-2. **Der "API-Scout" (Data Gatherer)**
-   - **Aufgabe:** Findet und nutzt *kostenlose* APIs (z.B. SteamSpy, Steam Web API, Twitch API, Gamalytic Free Tier). Holt rohe Metriken der Konkurrenten (z.B. CCU-Spikes bei SCUM nach einem bestimmten Update-Typ).
-   - **Freiheiten:** Darf Code schreiben (Python), um APIs abzufragen. Darf im Web nach neuen, offenen Datenquellen suchen. Scrapt aktiv strukturierte Daten.
-   - **Ausführung:** Täglich vormittags (z.B. 08:00 Uhr).
+### The Agent Roles
 
-3. **Der "Data Scientist" (Hypothesis & Insights Generator)**
-   - **Aufgabe:** Nimmt die Roaddaten des API-Scouts und wendet beliebige Data-Science-Methoden (Pandas, Scikit-Learn, Statsmodels) in Python an. Versucht, unkonventionelle Signale zu finden (z.B. "Korreliert die Sentiment-Analyse der Steam-Reviews von DayZ mit der Anzahl an Base-Building-Updates?").
-   - **Freiheiten:** Volle Freiheit, Python-Code für statistische Analysen und Machine Learning zu schreiben. **Strikte Vorgabe:** Darf nicht "p-hacken". Ergebnisse müssen statistisch sauber, redlich und signifikant (p < 0.05) sein. Nur signifikante Ergebnisse gelten als Erfolg, Fehlschläge ("Valuable Failures") müssen ebenfalls dokumentiert werden.
-   - **Ausführung:** Täglich mittags (z.B. 12:00 Uhr), arbeitet so lange, bis ein signifikantes Ergebnis oder ein wertvoller Fehlschlag dokumentiert ist.
+1. **The "Supervisor" (Executive Contextualizer)**
+   - **Task:** Reviews the newly synthesized daily reports and places them into the broader context of *all* historical executive summaries and deep-dive reports. It acts as the final executive filter.
+   - **Autonomy:** Read-only access to all reports. It connects dots across long timelines. It does *not* fetch macro-events (that is no longer its role) and does *not* write code.
+   - **Execution Time:** Daily, early morning.
 
-4. **Der "Red-Team Auditor" (Quality Assurance & Scientific Integrity)**
-   - **Aufgabe:** Prüft die Code-Traces und Reports des Data Scientists. Hat er Ausreißer ohne guten Grund gelöscht, um das Ergebnis signifikant zu machen? Hat er "Happy-Pathing" betrieben?
-   - **Freiheiten:** Liest Code und Logs. Darf Berichte mit einem "Veto" markieren, wenn methodisch unsauber gearbeitet wurde.
-   - **Ausführung:** Täglich nachmittags (z.B. 15:00 Uhr).
+2. **The "News Agent" (Domain-Specific Context)**
+   - **Task:** Actively searches and analyzes current news, social media sentiment, and community updates *specifically* related to "Ardem" and the defined hardcore survival competitors.
+   - **Autonomy:** Utilizes Google search and text extraction to identify narrative trends (e.g., "Players are complaining about cheaters in the latest Rust wipe").
+   - **Execution Time:** Daily, morning.
 
-5. **Der "Reporter" (Synthesis & Summary)**
-   - **Aufgabe:** Führt die freigegebenen Insights der letzten 24 Stunden zusammen und erstellt den finalen Management-Report für die Entwickler/Investoren von Ardem.
-   - **Freiheiten:** Reiner Text-Agent. Liest die validierten Markdown-Dateien und fasst sie verständlich zusammen.
-   - **Ausführung:** Täglich abends (z.B. 18:00 Uhr).
+3. **The "API-Scout" (Data Gatherer)**
+   - **Task:** Discovers and connects to free APIs (e.g., Steam Web API, Twitch API, Gamalytic Free Tier). Scrapes structured raw metrics (e.g., concurrent user spikes, review volumes).
+   - **Autonomy:** Writes Python code to query APIs. Actively seeks out new open data sources.
+   - **Execution Time:** Daily, mid-morning.
 
-## 3. Architektur- und Workflow-Graph (Mermaid)
+4. **The "Data Scientist" (Hypothesis & Insights Generator)**
+   - **Task:** Processes the raw data using advanced Python libraries (Pandas, Scikit-Learn). Maintains and updates a `methodology_logbook.csv`.
+   - **Session Structure:**
+     - *Phase 1: Proven Methods.* Executes methodologies from the logbook rated highly (e.g., >80/100) to ensure baseline reliable metrics are generated.
+     - *Phase 2: Mixed-Result Methods.* Reviews methodologies rated moderately (e.g., 60/100) and attempts to refine or apply them to new datasets to see if they yield better results this time.
+     - *Phase 3: Innovation.* Must propose and test at least one completely new, state-of-the-art methodology (e.g., applying Topological Data Analysis to player overlap).
+   - **Autonomy:** Full coding freedom for statistical analysis. Must strictly adhere to scientific honesty (no p-hacking). Must log all attempts, even failures.
+   - **Execution Time:** Daily, noon.
 
-Das folgende Diagramm visualisiert den zeitlichen Ablauf und die Interaktion der Agenten in einem typischen Tageszyklus:
+5. **The "Red-Team Auditor" (Quality Assurance)**
+   - **Task:** Reviews the code traces and data handling of the Data Scientist. Checks for fabricated significance, unjustified exclusion of outliers, and "happy-pathing."
+   - **Autonomy:** Reads code and logs. Can issue a "VETO" to reject unscientific reports.
+   - **Execution Time:** Daily, afternoon.
+
+6. **The "Reporter" (Synthesis & Summary)**
+   - **Task:** Merges the validated insights from the Data Scientist and the narrative context from the News Agent into a final, coherent executive report.
+   - **Autonomy:** Text-only agent. Synthesizes Markdown files.
+   - **Execution Time:** Daily, late afternoon.
+
+7. **The "Meta-Improvement Agent" (Pipeline Architect)**
+   - **Task:** Reviews the entire daily pipeline from a meta-perspective. Analyzes execution logs, prompt effectiveness, rejection rates by the Auditor, and overall bloat.
+   - **Autonomy:** Has the authority to dynamically rewrite and improve the system prompts for *all other agents*. Can suggest expanding or shrinking the pipeline size. If the Data Scientist is stuck in a rut, this agent rewrites its prompt to force creativity.
+   - **Execution Time:** Daily, night.
+
+## 3. Architecture and Workflow Graph (Mermaid)
 
 ```mermaid
 graph TD
-    subgraph "06:00 - Setup & Macro Context"
-        A[Supervisor Agent] -->|Reads News, Sets Daily Goals| B{Macro Event?}
-        B -- Yes --> C[Flag: Adjust metrics for volatility]
-        B -- No --> D[Normal Operation]
+    subgraph "08:00 - Context & Raw Data"
+        A[News Agent] -->|Gathers narrative context| B[(Context DB)]
+        C[API-Scout] -->|Writes Python, Hits Free APIs| D[(Raw Data)]
     end
 
-    subgraph "08:00 - Data Acquisition"
-        D --> E[API-Scout Agent]
-        C --> E
-        E -->|Writes Python, Hits Free APIs| F[(Raw Data / JSONs)]
+    subgraph "12:00 - Data Science (3-Phase Session)"
+        D --> E[Data Scientist]
+        E <-->|Reads/Updates| F[(methodology_logbook.csv)]
+        E -->|Phase 1: Proven Methods| G
+        E -->|Phase 2: Mixed Methods| G
+        E -->|Phase 3: New Methods| G[Draft Signal Report]
     end
 
-    subgraph "12:00 - Exploration & Statistics"
-        F --> G[Data Scientist Agent]
-        G -->|Runs Models, Python| H{Is Result Significant?}
-        H -- No --> I[Log 'Valuable Failure']
-        H -- Yes --> J[Draft Signal Report]
+    subgraph "15:00 - Scientific Audit"
+        G --> H[Red-Team Auditor]
+        H -->|Reads Code & Traces| I{p-Hacking Detected?}
+        I -- Yes --> J[VETO: Reject]
+        I -- No --> K[APPROVE: Validate Signal]
     end
 
-    subgraph "15:00 - Quality Assurance"
-        J --> K[Red-Team Auditor Agent]
-        K -->|Reads Code & Data| L{p-Hacking Detected?}
-        L -- Yes --> M[VETO: Reject Report]
-        L -- No --> N[APPROVE: Validate Signal]
+    subgraph "18:00 - Synthesis & Contextualization"
+        B --> L[Reporter]
+        K --> L
+        L --> M[Draft Executive Report]
+        M --> N[Supervisor]
+        N -->|Compares with history| O[Final Contextualized Report]
     end
 
-    subgraph "18:00 - Synthesis"
-        I --> O[Reporter Agent]
-        N --> O
-        O -->|Creates Final MD| P[reports/YYYY-MM-DD_Summary.md]
+    subgraph "23:00 - System Evolution"
+        J -.-> P
+        O -.-> P[Meta-Improvement Agent]
+        P -->|Rewrites Prompts & Adjusts Pipeline| Q[(prompts/ directory)]
     end
-
-    M -.->|Feedback loop for next day| A
-```
-
-## 4. Struktur eines Berichts (Report Metadata)
-
-Jeder Agent speichert seine Arbeit in einem Ordner (z.B. `reports/raw/` oder `reports/validated/`). Ein typischer Header für eine solche Datei sieht so aus:
-
-```markdown
----
-timestamp: 2024-05-20T12:34:56Z
-agent_role: "Data Scientist"
-game_context: "Ardem vs. Rust"
-data_sources: ["Steam Web API", "Twitch Free Tier API"]
-methodology: "Linear Regression (Pandas, Statsmodels)"
-significance_p_value: 0.034
-status: "Pending Audit"
----
-
-### Was wurde untersucht?
-Wir haben geprüft, ob ein Anstieg der Twitch-Zuschauerzahlen bei Rust-Wipe-Events direkt mit einem Anstieg der Steam-Wishlists bei ähnlichen Survival-Games korreliert.
-
-### Das Ergebnis
-[...Details der Analyse...]
 ```
