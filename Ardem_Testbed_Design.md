@@ -1,4 +1,6 @@
-# Ardem - Signal-Agent Testbed Design
+# CENTRAL MANIFEST: Ardem - Signal-Agent Testbed Design
+
+**Notice to All Agents:** This document is the central architectural manifest ("Zentrale"). It dictates the pipeline structure, file locations, and permissions. You must read and understand the system state defined here before executing your specific role.
 
 ## 1. Introduction & Context: "Ardem" and its Competitors
 
@@ -59,12 +61,22 @@ The system is governed by specialized prompts (roles) executed sequentially via 
    - **Autonomy:** Has the authority to dynamically rewrite and improve the system prompts for *all other agents*. Can suggest expanding or shrinking the pipeline size. If the Data Scientist is stuck in a rut, this agent rewrites its prompt to force creativity.
    - **Execution Time:** Daily, night.
 
-## 3. Persistent Data Architecture
+## 3. Persistent Data Architecture & Directory Permissions
 
-The project relies on a persistent data storage model rather than ephemeral daily logs. The raw and processed data must be kept in the repository (not added to `.gitignore`) to build a historical database.
+The project relies on a persistent data storage model. All findings and processed data are legitimate artifacts tracked in the Git repository. The only ignored folder is the temporary raw data.
 
-- **`data/raw/`**: Temporary storage for the API-Scout's daily downloads. Cleared after successful processing.
-- **`data/processed/`**: The permanent, thematically organized repository (e.g., `data/processed/ccu_history/`). This is the primary sandbox for the Data Scientist.
+- **`data/raw/`**: (Ignored by Git) Temporary storage for the API-Scout's daily downloads.
+  - *Permissions:* API-Scout (Read/Write/Delete).
+- **`data/processed/`**: (Tracked) The permanent, thematically organized repository (e.g., `data/processed/ccu_history/`).
+  - *Permissions:* API-Scout (Write), Data Scientist (Read), Meta-Improvement (Read).
+- **`methodology_logbook.csv`**: (Tracked) The central logbook of Data Science experiments.
+  - *Permissions:* Data Scientist (Read/Write), Meta-Improvement (Read).
+- **`logs/`**: (Tracked) Daily operational logs organized by `YYYY-MM-DD`.
+  - *Permissions:* All Agents (Write to their respective files).
+- **`reports/`**: (Tracked) Final daily executive summaries.
+  - *Permissions:* Reporter (Write), Supervisor (Read/Write), Meta-Improvement (Read).
+- **`prompts/`**: (Tracked) The system prompts driving each agent.
+  - *Permissions:* Meta-Improvement (Read/Write to evolve the system), All others (Read-only).
 
 ## 4. Architecture and Workflow Graph (Mermaid)
 

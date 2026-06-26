@@ -1,0 +1,13 @@
+# Ardem Testbed Gitignore
+
+# Ignore temporary raw data downloads
+data/raw/
+
+# Explicitly track processed data, reports, logs, and methodologies
+!data/processed/
+!reports/
+!logs/
+!methodology_logbook.csv
+
+# Ignore node_modules if present
+node_modules/
