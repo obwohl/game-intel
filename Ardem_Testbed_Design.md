@@ -31,12 +31,12 @@ The system is governed by specialized prompts (roles) executed sequentially via 
    - **Execution Time:** Daily, morning.
 
 3. **The "API-Scout" (Data Gatherer)**
-   - **Task:** Discovers and connects to free APIs (e.g., Steam Web API, Twitch API, Gamalytic Free Tier). Scrapes structured raw metrics (e.g., concurrent user spikes, review volumes).
-   - **Autonomy:** Writes Python code to query APIs. Actively seeks out new open data sources.
+   - **Task:** Discovers and connects to free APIs (e.g., Steam Web API, Twitch API, Gamalytic Free Tier). Scrapes structured raw metrics, cleans the data, and organizes it into a persistent, thematic repository structure.
+   - **Autonomy:** Writes Python code to query APIs, clean datasets, and manage files. Actively seeks out deeper, unconventional data sources. Maintains the `data/raw/` (temporary) and `data/processed/` (persistent) directory structures.
    - **Execution Time:** Daily, mid-morning.
 
 4. **The "Data Scientist" (Hypothesis & Insights Generator)**
-   - **Task:** Processes the raw data using advanced Python libraries (Pandas, Scikit-Learn). Maintains and updates a `methodology_logbook.csv`.
+   - **Task:** Processes the entire historical dataset (`data/processed/`) using advanced Python libraries (Pandas, Scikit-Learn). Maintains and updates a `methodology_logbook.csv`. Focuses on building time-series and cross-referencing multiple days of data.
    - **Session Structure:**
      - *Phase 1: Proven Methods.* Executes methodologies from the logbook rated highly (e.g., >80/100) to ensure baseline reliable metrics are generated.
      - *Phase 2: Mixed-Result Methods.* Reviews methodologies rated moderately (e.g., 60/100) and attempts to refine or apply them to new datasets to see if they yield better results this time.
@@ -59,41 +59,50 @@ The system is governed by specialized prompts (roles) executed sequentially via 
    - **Autonomy:** Has the authority to dynamically rewrite and improve the system prompts for *all other agents*. Can suggest expanding or shrinking the pipeline size. If the Data Scientist is stuck in a rut, this agent rewrites its prompt to force creativity.
    - **Execution Time:** Daily, night.
 
-## 3. Architecture and Workflow Graph (Mermaid)
+## 3. Persistent Data Architecture
+
+The project relies on a persistent data storage model rather than ephemeral daily logs. The raw and processed data must be kept in the repository (not added to `.gitignore`) to build a historical database.
+
+- **`data/raw/`**: Temporary storage for the API-Scout's daily downloads. Cleared after successful processing.
+- **`data/processed/`**: The permanent, thematically organized repository (e.g., `data/processed/ccu_history/`). This is the primary sandbox for the Data Scientist.
+
+## 4. Architecture and Workflow Graph (Mermaid)
 
 ```mermaid
 graph TD
-    subgraph "08:00 - Context & Raw Data"
+    subgraph "08:00 - Context & Data Engineering"
         A[News Agent] -->|Gathers narrative context| B[(Context DB)]
-        C[API-Scout] -->|Writes Python, Hits Free APIs| D[(Raw Data)]
+        C[API-Scout] -->|Writes Python, Hits Free APIs| D[(data/raw/)]
+        D -->|Cleans & Structurizes| E[(data/processed/)]
+        E -.->|Deletes temporary data| D
     end
 
     subgraph "12:00 - Data Science (3-Phase Session)"
-        D --> E[Data Scientist]
-        E <-->|Reads/Updates| F[(methodology_logbook.csv)]
-        E -->|Phase 1: Proven Methods| G
-        E -->|Phase 2: Mixed Methods| G
-        E -->|Phase 3: New Methods| G[Draft Signal Report]
+        E --> F[Data Scientist]
+        F <-->|Reads/Updates| G[(methodology_logbook.csv)]
+        F -->|Phase 1: Proven Methods| H
+        F -->|Phase 2: Mixed Methods| H
+        F -->|Phase 3: New Methods| H[Draft Signal Report]
     end
 
     subgraph "15:00 - Scientific Audit"
-        G --> H[Red-Team Auditor]
-        H -->|Reads Code & Traces| I{p-Hacking Detected?}
-        I -- Yes --> J[VETO: Reject]
-        I -- No --> K[APPROVE: Validate Signal]
+        H --> I[Red-Team Auditor]
+        I -->|Reads Code & Traces| J{p-Hacking Detected?}
+        J -- Yes --> K[VETO: Reject]
+        J -- No --> L[APPROVE: Validate Signal]
     end
 
     subgraph "18:00 - Synthesis & Contextualization"
-        B --> L[Reporter]
-        K --> L
-        L --> M[Draft Executive Report]
-        M --> N[Supervisor]
-        N -->|Compares with history| O[Final Contextualized Report]
+        B --> M[Reporter]
+        L --> M
+        M --> N[Draft Executive Report]
+        N --> O[Supervisor]
+        O -->|Compares with history| P[Final Contextualized Report]
     end
 
     subgraph "23:00 - System Evolution"
-        J -.-> P
-        O -.-> P[Meta-Improvement Agent]
-        P -->|Rewrites Prompts & Adjusts Pipeline| Q[(prompts/ directory)]
+        K -.-> Q
+        P -.-> Q[Meta-Improvement Agent]
+        Q -->|Rewrites Prompts & Adjusts Pipeline| R[(prompts/ directory)]
     end
 ```
