@@ -24,7 +24,7 @@ This report provides publisher-level market intelligence, focusing on actionable
 ### Project Zomboid (Build 42): The Vanilla vs. Mod Divide
 
 * **Community Fragmentation:** Build 42 remains a polarizing update. While the core "vanilla" experience is highly praised by veterans ("superior in every way"), the wider subreddit is flooded with bug complaints.
-* **Actionable Insight:** Deeper analysis reveals these bugs are almost entirely mod-conflict related, not engine failures. The community is "overdramatic."
+* **Root Cause Analysis:** Deeper analysis reveals these bugs are almost entirely mod-conflict related, not engine failures. The core player base indicates that the negative sentiment is disproportionate to the actual stability of the vanilla game.
 * **Publisher Actionable Insight:** Ardem's long-term goal of "Modding support" must be coupled with a highly robust mod-manager and clear API to avoid the exact community friction PZ is experiencing right now.
 
 ### 7 Days to Die (V3.0): The Influencer Blitz
@@ -32,6 +32,10 @@ This report provides publisher-level market intelligence, focusing on actionable
 * **Marketing Strategy:** 7DtD has launched "V3.0 Dead Hot Summer" with a massive, coordinated "Streamer Weekend" starting June 12, 2026. This involves over 500 streamers across 48+ countries giving away keys. The stable release follows on June 29.
 * **Monetization Context:** The game holds its price at €43.99 with no Steam discount during this blitz. This is a pure live-service style re-engagement strategy for a mature sandbox game.
 * **Publisher Actionable Insight:** Ardem's PR team needs to study the 7DtD influencer distribution model. 7DtD's strategy of blanketing global streamers simultaneously is dominating the current survival narrative. Ardem's August playtest needs a similar, highly coordinated creator rollout to compete for visibility.
+
+### DayZ & SCUM: Steady State Monitoring
+
+* **Current Status:** No significant new narrative trends, major sentiment shifts, or crisis points have been detected for either DayZ or SCUM in the current search window. Both titles appear to be maintaining their baseline community engagement without significant disruption or hype cycles.
 
 ## 3. Directives for Data Science (Agent 03/04)
 
