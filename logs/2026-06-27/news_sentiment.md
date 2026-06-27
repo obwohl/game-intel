@@ -5,7 +5,7 @@
 
 ## Executive Summary
 
-This report analyzes recent narrative trends and community sentiment concerning the upcoming hardcore survival MMO "Ardem" and its direct competitors. The objective is to extract actionable intelligence for Ardem's publishers regarding monetization friction, competitor mechanics, and strategic market opportunities.
+This report analyzes recent narrative trends and community sentiment concerning the upcoming hardcore survival MMO "Ardem" and its direct competitors. The objective is to extract actionable intelligence for Ardem's publishers regarding competitor mechanics and strategic market opportunities.
 
 ---
 
@@ -53,8 +53,8 @@ This report analyzes recent narrative trends and community sentiment concerning 
 
 A recurring theme across Rust and other wipe-based survival games is rapid server population decline shortly after a wipe.
 
-- **Root Cause:** This is primarily driven by the "snowball effect," where established groups rapidly dominate, leaving new or solo players with insurmountable disadvantages and leading to frustration.
-- **Publisher Actionable Insight:** Ardem must design its MMO progression to mitigate early-game wipeout. Consider mechanics that allow for "safe zones" or tiered progression areas, ensuring that new players can establish a foothold even against entrenched factions.
+- **Root Cause:** This is primarily driven by the "snowball effect," where established groups rapidly dominate, leaving new or solo players with insurmountable disadvantages and leading to frustration. Furthermore, progression fatigue plays a massive role; players simply burn out trying to maintain progression in a rapidly resetting environment.
+- **Publisher Actionable Insight:** Ardem must design its MMO progression to mitigate early-game wipeout and address progression fatigue. Consider mechanics that allow for "safe zones" or tiered progression areas, ensuring that new players can establish a foothold even against entrenched factions, and provide persistent mid-to-late game goals that respect player time.
 
 ## Proposals for Data Gatherer
 
