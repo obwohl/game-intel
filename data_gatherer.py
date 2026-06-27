@@ -5,6 +5,7 @@ import shutil
 import requests
 import pandas as pd
 from datetime import datetime
+import time
 
 # Configuration
 GAMES = {
@@ -14,7 +15,7 @@ GAMES = {
     "Project Zomboid": "108600",
     "7 Days to Die": "251570"
 }
-PERFORMANCE_KEYWORDS = ["lag", "fps", "drop", "stutter", "performance"]
+MARKETING_KEYWORDS = ["hype", "early access", "trailer", "streamer", "tiktok", "youtube", "worth it", "twitch"]
 
 def get_current_date():
     try:
@@ -29,43 +30,45 @@ CURRENT_DATE = get_current_date()
 # Directories
 RAW_DIR = os.path.join("data", "raw", CURRENT_DATE)
 PROCESSED_DIR = os.path.join("data", "processed")
-PLAYER_COUNTS_DIR = os.path.join(PROCESSED_DIR, "player_counts")
-SENTIMENT_DIR = os.path.join(PROCESSED_DIR, "performance_sentiment")
-BI_SUMMARY_DIR = os.path.join(PROCESSED_DIR, "bi_summary_stats")
+MARKETING_DIR = os.path.join(PROCESSED_DIR, "marketing_metrics")
+HYPE_DIR = os.path.join(PROCESSED_DIR, "hype_sentiment")
 
 def setup_directories():
-    for d in [RAW_DIR, PLAYER_COUNTS_DIR, SENTIMENT_DIR, BI_SUMMARY_DIR]:
+    for d in [RAW_DIR, MARKETING_DIR, HYPE_DIR]:
         os.makedirs(d, exist_ok=True)
 
-def fetch_player_count(appid):
-    url = f"https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid={appid}"
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        if "response" in data and "player_count" in data["response"]:
-            return data["response"]["player_count"]
-    return None
+def fetch_steamspy_data(appid):
+    url = f"https://steamspy.com/api.php?request=appdetails&appid={appid}"
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            return response.json()
+    except Exception as e:
+        print(f"Error fetching SteamSpy data for {appid}: {e}")
+    return {}
 
 def fetch_reviews(appid, num_per_page=100):
-    # Fetch recent reviews and summary stats for BI
     url = f"https://store.steampowered.com/appreviews/{appid}?json=1&filter=recent&num_per_page={num_per_page}&language=english"
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        return data.get("reviews", []), data.get("query_summary", {})
-    return [], {}
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
+            return data.get("reviews", [])
+    except Exception as e:
+        print(f"Error fetching reviews for {appid}: {e}")
+    return []
 
 def gather_raw_data():
     raw_data = {}
     for game, appid in GAMES.items():
-        print(f"Gathering raw data for {game}...")
-        player_count = fetch_player_count(appid)
-        reviews, query_summary = fetch_reviews(appid)
+        print(f"Gathering raw marketing data for {game}...")
+        steamspy_data = fetch_steamspy_data(appid)
+        time.sleep(1) # Be polite to SteamSpy API
+        reviews = fetch_reviews(appid)
 
         game_data = {
-            "player_count": player_count,
+            "steamspy": steamspy_data,
             "reviews": reviews,
-            "query_summary": query_summary,
             "appid": appid
         }
 
@@ -78,43 +81,30 @@ def gather_raw_data():
     return raw_data
 
 def process_data(raw_data):
-    # Process Player Counts
-    player_counts = []
+    # Process Marketing Metrics from SteamSpy
+    marketing_metrics = []
     for game, data in raw_data.items():
-        if data["player_count"] is not None:
-            player_counts.append({
+        if "steamspy" in data and data["steamspy"]:
+            spy = data["steamspy"]
+            marketing_metrics.append({
                 "date": CURRENT_DATE,
                 "game": game,
-                "player_count": data["player_count"]
+                "owners_range": spy.get("owners"),
+                "price_cents": spy.get("price"),
+                "initialprice_cents": spy.get("initialprice"),
+                "discount_percent": spy.get("discount"),
+                "positive_reviews": spy.get("positive"),
+                "negative_reviews": spy.get("negative"),
+                "top_tags": json.dumps(list(spy.get("tags", {}).keys())[:5]) if spy.get("tags") else ""
             })
 
-    if player_counts:
-        df_pc = pd.DataFrame(player_counts)
-        pc_file = os.path.join(PLAYER_COUNTS_DIR, f"{CURRENT_DATE}_player_counts.csv")
-        df_pc.to_csv(pc_file, index=False)
-        print(f"Saved processed player counts to {pc_file}")
+    if marketing_metrics:
+        df_mkt = pd.DataFrame(marketing_metrics)
+        mkt_file = os.path.join(MARKETING_DIR, f"{CURRENT_DATE}_marketing_metrics.csv")
+        df_mkt.to_csv(mkt_file, index=False)
+        print(f"Saved processed marketing metrics to {mkt_file}")
 
-    # Process BI Summary Stats
-    bi_stats = []
-    for game, data in raw_data.items():
-        if "query_summary" in data and data["query_summary"]:
-            summary = data["query_summary"]
-            bi_stats.append({
-                "date": CURRENT_DATE,
-                "game": game,
-                "review_score_desc": summary.get("review_score_desc"),
-                "total_positive": summary.get("total_positive"),
-                "total_negative": summary.get("total_negative"),
-                "total_reviews": summary.get("total_reviews")
-            })
-
-    if bi_stats:
-        df_bi = pd.DataFrame(bi_stats)
-        bi_file = os.path.join(BI_SUMMARY_DIR, f"{CURRENT_DATE}_bi_summary.csv")
-        df_bi.to_csv(bi_file, index=False)
-        print(f"Saved BI summary stats to {bi_file}")
-
-    # Process Reviews for Performance Sentiment (Now including all games for thorough BI)
+    # Process Reviews for Hype & Influencer Sentiment
     for game in GAMES.keys():
         if game in raw_data:
             reviews = raw_data[game]["reviews"]
@@ -122,22 +112,25 @@ def process_data(raw_data):
 
             for review in reviews:
                 text = review.get("review", "").lower()
-                has_perf_issue = any(keyword in text for keyword in PERFORMANCE_KEYWORDS)
+                hype_mentions = [kw for kw in MARKETING_KEYWORDS if kw in text]
 
-                sentiment_data.append({
-                    "date": CURRENT_DATE,
-                    "game": game,
-                    "recommendationid": review.get("recommendationid"),
-                    "voted_up": review.get("voted_up"),
-                    "has_performance_complaint": has_perf_issue,
-                    "review_length": len(text)
-                })
+                if hype_mentions:
+                    sentiment_data.append({
+                        "date": CURRENT_DATE,
+                        "game": game,
+                        "recommendationid": review.get("recommendationid"),
+                        "voted_up": review.get("voted_up"),
+                        "hype_keywords_found": ", ".join(hype_mentions),
+                        "review_length": len(text)
+                    })
 
             if sentiment_data:
                 df_sent = pd.DataFrame(sentiment_data)
-                sent_file = os.path.join(SENTIMENT_DIR, f"{CURRENT_DATE}_{game.replace(' ', '_')}_sentiment.csv")
+                sent_file = os.path.join(HYPE_DIR, f"{CURRENT_DATE}_{game.replace(' ', '_')}_hype_sentiment.csv")
                 df_sent.to_csv(sent_file, index=False)
-                print(f"Saved processed sentiment for {game} to {sent_file}")
+                print(f"Saved hype sentiment for {game} to {sent_file}")
+            else:
+                print(f"No hype keywords found for {game} today.")
 
 def cleanup_raw_data():
     if os.path.exists(RAW_DIR):
@@ -149,4 +142,4 @@ if __name__ == "__main__":
     raw_data = gather_raw_data()
     process_data(raw_data)
     cleanup_raw_data()
-    print("Data Gatherer pipeline completed successfully.")
+    print("Data Gatherer (Marketing Focus) pipeline completed successfully.")
