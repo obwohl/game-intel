@@ -40,7 +40,7 @@ def setup_directories():
 def fetch_steamspy_data(appid):
     url = f"https://steamspy.com/api.php?request=appdetails&appid={appid}"
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=10)
         if response.status_code == 200:
             return response.json()
     except Exception as e:
@@ -50,7 +50,7 @@ def fetch_steamspy_data(appid):
 def fetch_reviews(appid, num_per_page=100):
     url = f"https://store.steampowered.com/appreviews/{appid}?json=1&filter=recent&num_per_page={num_per_page}&language=english"
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=10)
         if response.status_code == 200:
             data = response.json()
             return data.get("reviews", [])
@@ -95,7 +95,7 @@ def process_data(raw_data):
                 "discount_percent": spy.get("discount"),
                 "positive_reviews": spy.get("positive"),
                 "negative_reviews": spy.get("negative"),
-                "top_tags": json.dumps(list(spy.get("tags", {}).keys())[:5]) if spy.get("tags") else ""
+                "top_tags": json.dumps(list(spy["tags"].keys())[:5]) if isinstance(spy.get("tags"), dict) else ""
             })
 
     if marketing_metrics:
@@ -111,7 +111,7 @@ def process_data(raw_data):
             sentiment_data = []
 
             for review in reviews:
-                text = review.get("review", "").lower()
+                text = (review.get("review") or "").lower()
                 hype_mentions = [kw for kw in MARKETING_KEYWORDS if kw in text]
 
                 if hype_mentions:
