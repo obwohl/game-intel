@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/obwohl/game-intel/issues"
   },
-  "homepage": "https://github.com/obwohl/game-intel#readme"
+  "homepage": "https://github.com/obwohl/game-intel#readme",
+  "devDependencies": {
+    "markdownlint-cli": "^0.49.0"
+  }
 }
