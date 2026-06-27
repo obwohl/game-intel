@@ -1,4 +1,5 @@
 date,game,recommendationid,voted_up,has_performance_complaint,review_length
+2026-06-27,SCUM,228958447,False,False,30
 2026-06-27,SCUM,228931568,False,False,29
 2026-06-27,SCUM,228922997,True,False,18
 2026-06-27,SCUM,228922213,True,False,21
@@ -95,7 +96,6 @@ date,game,recommendationid,voted_up,has_performance_complaint,review_length
 2026-06-27,SCUM,227493635,True,False,9
 2026-06-27,SCUM,227493470,True,False,55
 2026-06-27,SCUM,227492877,True,False,42
-2026-06-27,SCUM,227489410,False,False,218
+2026-06-27,SCUM,227489410,True,False,119
 2026-06-27,SCUM,227482230,True,False,69
 2026-06-27,SCUM,227480716,False,False,30
-2026-06-27,SCUM,227476801,True,False,1302
