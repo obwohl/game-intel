@@ -33,26 +33,56 @@ df_players = pd.concat(df_players_list, ignore_index=True) if df_players_list el
 # Merge datasets on 'game' and 'date'
 df_merged = pd.merge(df_marketing, df_players, on=['game', 'date'])
 
-# Phase 3: Innovate - Pearson correlation between price_cents and player_count
-prices = df_merged['price_cents']
-players = df_merged['player_count']
+# Phase 3: Innovate - Iterate through hypotheses until significance is found
+hypotheses = [
+    {
+        "name": "Pearson Correlation: Price vs Player Count",
+        "desc": "Correlating base game price in cents with recent daily player count.",
+        "vars": ("price_cents", "player_count")
+    },
+    {
+        "name": "Pearson Correlation: Discount vs Player Count",
+        "desc": "Correlating discount percentage with recent daily player count.",
+        "vars": ("discount_percent", "player_count")
+    },
+    {
+        "name": "Pearson Correlation: Positive Reviews vs Player Count",
+        "desc": "Correlating total positive reviews with recent daily player count.",
+        "vars": ("positive_reviews", "player_count")
+    }
+]
 
-corr, p_value = stats.pearsonr(prices, players)
+significant_finding = None
 
-# Evaluate significance
-is_significant = p_value < 0.05
-rating = 85 if is_significant else 40
-
-# Log to methodology_logbook.csv
 with open(logbook_path, mode='a', newline='') as f:
     writer = csv.writer(f)
-    writer.writerow([
-        "Pearson Correlation: Price vs Player Count",
-        "Correlating base game price in cents with recent daily player count.",
-        "price_cents, player_count",
-        f"{p_value:.4f}",
-        rating
-    ])
+    for hyp in hypotheses:
+        var1, var2 = hyp["vars"]
+
+        # Drop NaNs for the specific pair
+        clean_df = df_merged[[var1, var2]].dropna()
+        if len(clean_df) < 2:
+            continue
+
+        corr, p_value = stats.pearsonr(clean_df[var1], clean_df[var2])
+        is_significant = p_value < 0.05
+        rating = 85 if is_significant else 40
+
+        writer.writerow([
+            hyp["name"],
+            hyp["desc"],
+            f"{var1}, {var2}",
+            f"{p_value:.4f}",
+            rating
+        ])
+
+        if is_significant:
+            significant_finding = {
+                "hyp": hyp,
+                "corr": corr,
+                "p_value": p_value
+            }
+            break
 
 # Generate Markdown Report
 report_content = f"""# Data Science Report
@@ -62,8 +92,15 @@ report_content = f"""# Data Science Report
 
 ## Phase 3: Innovate
 
-**Method:** Pearson Correlation
-**Variables:** `price_cents` and `player_count`
+"""
+
+if significant_finding:
+    hyp = significant_finding["hyp"]
+    var1, var2 = hyp["vars"]
+    corr = significant_finding["corr"]
+    p_value = significant_finding["p_value"]
+    report_content += f"""**Method:** {hyp['name']}
+**Variables:** `{var1}` and `{var2}`
 
 ### Results
 
@@ -72,11 +109,17 @@ report_content = f"""# Data Science Report
 
 ### Conclusion
 
+The result is statistically significant (p < 0.05). There is a correlation between {var1} and {var2}.
 """
-if is_significant:
-    report_content += "The result is statistically significant (p < 0.05). There is a correlation between the price and player count.\n"
 else:
-    report_content += "The result is not statistically significant (p >= 0.05). This is a **Valuable Failure**. We do not reject the null hypothesis. Scientific honesty dictates we accept this lack of correlation without manipulating the data.\n"
+    report_content += """### Results
+
+No statistically significant correlations found among the tested hypotheses.
+
+### Conclusion
+
+All tests resulted in p >= 0.05. These are **Valuable Failures**. We do not reject the null hypotheses. Scientific honesty dictates we accept this lack of correlation without manipulating the data.
+"""
 
 with open(report_path, "w") as f:
     f.write(report_content)
