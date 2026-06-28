@@ -1,0 +1,6 @@
+date,game,owners_range,price_cents,initialprice_cents,discount_percent,positive_reviews,negative_reviews,top_tags
+2026-06-27,Rust,"20,000,000 .. 50,000,000",1999,3999,50,1071135,156649,"[""Survival"", ""Crafting"", ""Multiplayer"", ""Open World"", ""Open World Survival Craft""]"
+2026-06-27,SCUM,"5,000,000 .. 10,000,000",4499,4499,0,83704,28411,"[""Survival"", ""Open World Survival Craft"", ""Multiplayer"", ""Open World"", ""Zombies""]"
+2026-06-27,DayZ,"10,000,000 .. 20,000,000",2499,4999,50,330349,99903,"[""Survival"", ""Open World"", ""Online Co-Op"", ""Zombies"", ""Multiplayer""]"
+2026-06-27,Project Zomboid,"10,000,000 .. 20,000,000",1999,1999,0,355171,21892,"[""Survival"", ""Zombies"", ""Open World"", ""Multiplayer"", ""Open World Survival Craft""]"
+2026-06-27,7 Days to Die,"10,000,000 .. 20,000,000",2474,4499,45,327889,42157,"[""Survival"", ""Zombies"", ""Multiplayer"", ""Open World"", ""Open World Survival Craft""]"
