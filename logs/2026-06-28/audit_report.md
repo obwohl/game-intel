@@ -10,7 +10,7 @@ The Data Scientist's report dated 2026-06-28 has been reviewed. The findings pre
 
 ## Detailed Critique
 
-### 1. The "Outlier" Fallacy (Extreme Heteroscedasticity)
+### 1. The "Outlier" Fallacy (High Leverage / Influential Outlier)
 
 The dataset contains only 5 data points (N=5). The entire correlation coefficient (r = 0.9802) is being artificially inflated by a single massive outlier: **Rust**. Rust's player count and positive reviews are an order of magnitude larger than the other games in the dataset.
 
