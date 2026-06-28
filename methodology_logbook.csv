@@ -1,0 +1,2 @@
+Method Name,Description,Variables Tested,p-value,Rating
+Pearson Correlation: Price vs Player Count,Correlating base game price in cents with recent daily player count.,"price_cents, player_count",0.2647,40
