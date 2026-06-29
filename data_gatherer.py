@@ -8,13 +8,34 @@ from datetime import datetime
 import time
 
 # Configuration
-GAMES = {
+
+def get_top_survival_games(limit=50):
+    url = "https://steamspy.com/api.php?request=tag&tag=Survival"
+    try:
+        response = requests.get(url, timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            # Sort by ccu (if available) to get the most relevant ones
+            games = sorted(
+                [x for x in data.values() if isinstance(x, dict)],
+                key=lambda x: int(x.get('ccu') or 0),
+                reverse=True
+            )[:limit]
+            return {g['name']: str(g['appid']) for g in games if 'name' in g and 'appid' in g}
+    except Exception as e:
+        print(f"Error fetching top survival games: {e}")
+    return {}
+
+DEFAULT_GAMES = {
     "Rust": "252490",
     "SCUM": "513710",
     "DayZ": "221100",
     "Project Zomboid": "108600",
     "7 Days to Die": "251570"
 }
+
+GAMES = get_top_survival_games() or DEFAULT_GAMES
+
 MARKETING_KEYWORDS = ["hype", "early access", "trailer", "streamer", "tiktok", "youtube", "worth it", "twitch"]
 
 def get_current_date():
@@ -31,10 +52,11 @@ CURRENT_DATE = get_current_date()
 RAW_DIR = os.path.join("data", "raw", CURRENT_DATE)
 PROCESSED_DIR = os.path.join("data", "processed")
 MARKETING_DIR = os.path.join(PROCESSED_DIR, "marketing_metrics")
+PLAYER_COUNTS_DIR = os.path.join(PROCESSED_DIR, "player_counts")
 HYPE_DIR = os.path.join(PROCESSED_DIR, "hype_sentiment")
 
 def setup_directories():
-    for d in [RAW_DIR, MARKETING_DIR, HYPE_DIR]:
+    for d in [RAW_DIR, MARKETING_DIR, HYPE_DIR, PLAYER_COUNTS_DIR]:
         os.makedirs(d, exist_ok=True)
 
 def fetch_steamspy_data(appid):
@@ -81,8 +103,9 @@ def gather_raw_data():
     return raw_data
 
 def process_data(raw_data):
-    # Process Marketing Metrics from SteamSpy
+# Process Marketing Metrics and Player Counts from SteamSpy
     marketing_metrics = []
+    player_counts = []
     for game, data in raw_data.items():
         if "steamspy" in data and data["steamspy"]:
             spy = data["steamspy"]
@@ -97,12 +120,24 @@ def process_data(raw_data):
                 "negative_reviews": spy.get("negative"),
                 "top_tags": json.dumps(list(spy["tags"].keys())[:5]) if isinstance(spy.get("tags"), dict) else ""
             })
+            if "ccu" in spy:
+                player_counts.append({
+                    "date": CURRENT_DATE,
+                    "game": game,
+                    "player_count": spy.get("ccu") or 0
+                })
 
     if marketing_metrics:
         df_mkt = pd.DataFrame(marketing_metrics)
         mkt_file = os.path.join(MARKETING_DIR, f"{CURRENT_DATE}_marketing_metrics.csv")
         df_mkt.to_csv(mkt_file, index=False)
         print(f"Saved processed marketing metrics to {mkt_file}")
+
+    if player_counts:
+        df_pc = pd.DataFrame(player_counts)
+        pc_file = os.path.join(PLAYER_COUNTS_DIR, f"{CURRENT_DATE}_player_counts.csv")
+        df_pc.to_csv(pc_file, index=False)
+        print(f"Saved processed player counts to {pc_file}")
 
     # Process Reviews for Hype & Influencer Sentiment
     for game in GAMES.keys():

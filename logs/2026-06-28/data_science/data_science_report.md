@@ -5,7 +5,7 @@
 
 ## Executive Summary
 
-Today's Exploratory Data Analysis (EDA) focused on extracting actionable Business Intelligence for the executive leadership of *Ardem* as we approach the Early Access launch. By manually correlating historical competitor marketing metrics against player retention (daily player counts), we identified which pre-launch marketing KPIs are statistically proven to predict long-term player base size.
+Today's Exploratory Data Analysis (EDA) focused on extracting actionable Business Intelligence for the executive leadership of *Ardem* using a statistically robust dataset (N=50) of top competitors in the Survival genre. We explicitly addressed high-leverage outliers to ensure findings are not artifacts of single massive games.
 
 ## Phase 3: Exploratory Data Analysis (EDA)
 
@@ -14,35 +14,38 @@ Today's Exploratory Data Analysis (EDA) focused on extracting actionable Busines
 **Method:** Pearson Correlation
 **Variables Tested:** `price_cents` vs `player_count`
 
-We initially theorized that lower barrier-to-entry (cheaper base price) correlates with higher daily active users in the hardcore survival genre.
+**Results (All Data, N=50):**
 
-**Results:**
+- **Correlation Coefficient:** -0.1183
+- **p-value:** 0.4132
 
-- **Correlation Coefficient:** -0.6199
+**Results (Excluding 5 Extreme Outliers, N=45):**
 
-- **p-value:** 0.2647
+- **Correlation Coefficient:** -0.1808
+- **p-value:** 0.2346
 
-**Conclusion:** The result is **not statistically significant** (p >= 0.05). This is a **Valuable Failure**. We do not reject the null hypothesis. Scientific honesty dictates we accept this lack of correlation.
-**BI Insight for Ardem:** Competing on price alone (a race to the bottom) is not a statistically sound strategy for long-term player retention in this specific MMO genre. Players prioritize deep mechanics over initial cost savings.
+**Conclusion:** The correlation remains weak or statistically insignificant even after accounting for scale differences. We do not reject the null hypothesis.
 
 ### Hypothesis 2: Brand Goodwill (Positive Sentiment)
 
 **Method:** Pearson Correlation
 **Variables Tested:** `positive_reviews` vs `player_count`
 
-Following the failure of Hypothesis 1, we theorized that long-term retention is instead strictly tied to overwhelming brand goodwill and positive community sentiment (as measured by cumulative positive Steam reviews).
+**Results (All Data, N=50):**
 
-**Results:**
+- **Correlation Coefficient:** 0.6159
+- **p-value:** 0.0000
 
-- **Correlation Coefficient:** 0.9802
+**Results (Excluding 5 Extreme Outliers, N=45):**
 
-- **p-value:** 0.0033
+- **Correlation Coefficient:** 0.3278
+- **p-value:** 0.0279
 
-**Conclusion:** The result is **highly statistically significant** (p < 0.05). There is an extremely strong positive correlation between total positive reviews and daily active players.
+**Conclusion:** With a robust sample size, we observe a positive correlation between positive reviews and active players, both with and without extreme outliers. However, we must strictly caveat that **correlation is not causation**. Positive reviews are typically a lagging indicator (players review games they already play), not a leading indicator that generates players.
 
 ## Publisher Actionable Insight (Ardem Pre-Launch)
 
-Based on the manual EDA, the data clearly indicates that total positive reviews are the primary leading indicator of sustainable player counts, while the base price is statistically irrelevant.
+Based on the robust EDA (N=50):
 
-**Recommendation for Executives:**
-For the upcoming Ardem Early Access launch, do not artificially lower the retail price to boost initial sales. Instead, allocate marketing budget strictly toward community management, influencer partnerships, and transparent developer communication. The singular goal of the pre-launch phase must be maximizing the ratio of positive reviews upon launch, as this is the only mathematically proven driver of the long-term MMO population.
+1. **Price is not the primary driver:** Competing in a race to the bottom on price is statistically unsound for player retention.
+2. **Community scale drives reviews, not vice-versa:** While positive reviews strongly correlate with high player counts, executives must recognize this is a lagging effect. You cannot "buy" active players simply by optimizing for positive reviews; you must build engaging mechanics that organically drive both play time and subsequent positive sentiment. Focus marketing on demonstrating deep, engaging gameplay.

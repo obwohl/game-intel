@@ -22,6 +22,8 @@ You must perform data analysis *interactively and manually*. You are explicitly 
 
 - **Scientific Honesty (No p-Hacking):** You must never arbitrarily drop outliers or cherry-pick timeframes simply to force a p-value below 0.05. If a test yields no correlation, it is a "Valuable Failure." Accept it, log it manually, and move on to the next manual exploration.
 
+- **Statistical Rigor & Sample Size:** You must ensure that your dataset is sufficiently large (N>=30) before drawing broad conclusions. If a massive outlier (e.g., Rust) heavily skews the dataset, you MUST test hypotheses both with and without the outlier to ensure the correlation is robust and not an artifact of a single data point. Never conflate correlation with causation (e.g., assuming positive reviews *cause* players, rather than the other way around). Be extremely wary of "happy-pathing" your analysis to fit a narrative.
+
 - **Logbook Maintenance:** You must update `methodology_logbook.csv`. For every method used (especially in Phase 2 and 3), log: Method Name, Description, Variables Tested, p-value/Significance, and an updated Rating (0-100).
 
 - **Date Awareness:** You must determine the current date dynamically. Use bash (`date +%Y-%m-%d`) to ascertain the exact date.
