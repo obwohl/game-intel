@@ -16,13 +16,25 @@ def get_top_survival_games(limit=50):
         if response.status_code == 200:
             data = response.json()
             # Sort by ccu (if available) to get the most relevant ones
-            games = sorted(data.values(), key=lambda x: x.get('ccu', 0), reverse=True)[:limit]
-            return {g['name']: str(g['appid']) for g in games}
+            games = sorted(
+                [x for x in data.values() if isinstance(x, dict)],
+                key=lambda x: int(x.get('ccu') or 0),
+                reverse=True
+            )[:limit]
+            return {g['name']: str(g['appid']) for g in games if 'name' in g and 'appid' in g}
     except Exception as e:
         print(f"Error fetching top survival games: {e}")
     return {}
 
-GAMES = get_top_survival_games()
+DEFAULT_GAMES = {
+    "Rust": "252490",
+    "SCUM": "513710",
+    "DayZ": "221100",
+    "Project Zomboid": "108600",
+    "7 Days to Die": "251570"
+}
+
+GAMES = get_top_survival_games() or DEFAULT_GAMES
 
 MARKETING_KEYWORDS = ["hype", "early access", "trailer", "streamer", "tiktok", "youtube", "worth it", "twitch"]
 
@@ -112,7 +124,7 @@ def process_data(raw_data):
                 player_counts.append({
                     "date": CURRENT_DATE,
                     "game": game,
-                    "player_count": spy.get("ccu", 0)
+                    "player_count": spy.get("ccu") or 0
                 })
 
     if marketing_metrics:
@@ -127,7 +139,6 @@ def process_data(raw_data):
         df_pc.to_csv(pc_file, index=False)
         print(f"Saved processed player counts to {pc_file}")
 
-    # Process Reviews for Hype & Influencer Sentiment
     # Process Reviews for Hype & Influencer Sentiment
     for game in GAMES.keys():
         if game in raw_data:
